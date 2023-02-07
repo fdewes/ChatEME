@@ -1,0 +1,59 @@
+{% extends 'ChatEME/base.html' %}
+
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="OK">
+</form>
+
+{% if context.qapairs %}
+
+<table id="QAPairs" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Confidence</th>
+            <th>Intent</th>
+            <th>Answer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c, qa in context.qapairs %}
+        <tr>
+            <td>{{c}}</td>
+            <td>{{qa.intent}}</td>
+            <td>{{qa.answer}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif%}
+
+{% if context.pages %}
+
+<table id="Webpages" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Confidence</th>
+            <th>Title</th>
+            <th>Text/Source</th>
+            <th>URL</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c, page in context.pages %}
+        <tr>
+            <td>{{c}}</td>
+            <td>{{page.get_short_title}}</td>
+            <td><a href="/ChatEME/{{context.model_id}}/{{page.id}}/page_source">Show</a></td>
+            <td><a href="{{page.page_url}}">Link</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif%}
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'ChatEME/base.html' %}
+
+{% block content %}
+<h1 class="mt-4">{{page.get_title}}. <a href="{{page.page_url}}">Show Page</a>
+</h1>
+<h2 class="mt-4">Extracted Text</h2>
+
+{% autoescape off %}
+{{page.display_text}}
+{% endautoescape %}
+
+<h2 class="mt-4">Page source</h2>
+
+<pre>{{page.get_html}}</pre>
+
+{% endblock %} 

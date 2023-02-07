@@ -1,0 +1,19 @@
+
+{% extends "ChatEME/base.html" %}
+
+{% block content %}
+
+<div class="col-md-7 mx-auto">
+
+<h1>Delete Item</h1>
+
+<section id = "login" class="gen_form">
+<form method="post" class="general_form" > 
+    {% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <p>You cannot undo this action.</p>
+    <button type="submit">Delete Item</button>
+</form>
+</section>
+</div>
+{% endblock %}

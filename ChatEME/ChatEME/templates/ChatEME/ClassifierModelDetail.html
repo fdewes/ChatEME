@@ -1,0 +1,229 @@
+{% extends 'ChatEME/base.html' %}
+
+{% block content %}
+
+<h1 class="mt-4">{{ model.name }}</h1>
+
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">{{ model.get_crawl_status }} ({{no_links_processed_webpages}}/{{no_active_webpages}} pages crawled)</li>
+    <li class="breadcrumb-item active">{{ model.get_model_builder_status }}</li>
+</ol>
+
+Jump to: <br>
+
+<a href="#qa_pairs">QA Pairs</a> - 
+<a href="#crawl_roots">Crawl Roots</a> - 
+<a href="#crawl_rules">Crawl Rules</a> - 
+<a href="#web_pages">Web Pages</a> - 
+<a href="#pages_tree_plot">Pages Tree Plot</a><br><br>
+
+
+{% if web_pages or qapairs %}
+<a href="/ChatEME/{{model.id}}/train_model" button class="btn btn-primary" role="button">Build Model</a>
+{% endif %}
+
+{% if model.model_exists %}
+<a href="/ChatEME/{{model.id}}/inspect_model" button class="btn btn-primary" role="button">Inspect Model</a>
+{% endif %}
+
+<a href="/ChatEME/{{model.id}}/import_RasaNLUFile" button class="btn btn-primary" role="button">Import RASA NLU File</a>
+<a href="/ChatEME/{{model.id}}/import_RasaDomainFile" button class="btn btn-primary" role="button">Import RASA Domain File</a>
+<a href="/ChatEME/{{model.id}}/export_oos2json" button class="btn btn-primary" role="button">Export RASA Out of Scope File</a>
+
+<a id="qa_pairs">
+<h2 class="mt-4">QA Pairs</h1>
+</a>
+
+<a href="/ChatEME/{{model.id}}/add_QAPair" button class="btn btn-primary" role="button">Add QAPair</a>
+
+<table id="QA Pairs" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Intent</th>
+            <th>Answer</th>
+            <th>Questions</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for qap in qapairs %}
+        <tr>
+            <td>{{qap.id}}</td>
+            <td>{{qap.intent}}</td>
+            <td>{{qap.answer}}</td>
+            <td>{{qap.questions }}</td>
+            <td>
+                <a href="/ChatEME/{{model.id}}/update_QAPair/{{qap.id}}" button class="btn btn-primary" role="button">Edit</a>
+                <a href="/ChatEME/{{model.id}}/delete_QAPair/{{qap.id}}" button class="btn btn-primary" role="button">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2 class="mt-4">Scraper Module</h1>
+<a id="crawl_roots">
+<h3 class="mt-4">Crawl Roots ({{no_crawl_roots}})</h1>
+</a>
+<a href="/ChatEME/{{model.id}}/add_CrawlRoot" button class="btn btn-primary" role="button">Add Crawl Root</a>
+<table id="Crawl Roots" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Short Name</th>
+            <th>Crawl Depth</th>
+            <th>Root Url</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cr in crawl_roots %}
+        <tr>
+            <td>{{cr.id}}</td>
+            <td>{{cr.short_name}}</td>
+            <td>{{cr.crawl_depth }}</td>
+            <td><a href="{{ cr.root_url}}">{{cr.root_url}}</a></td>
+            <td>
+                <a href="/ChatEME/{{model.id}}/update_CrawlRoot/{{cr.id}}" button class="btn btn-primary" role="button">Edit</a>
+                <a href="/ChatEME/{{model.id}}/delete_CrawlRoot/{{cr.id}}" button class="btn btn-primary" role="button">Delete</a>
+                <a href="/ChatEME/{{model.id}}/{{cr.id}}" button class="btn btn-primary" role="button">Add crawl rule</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<a id="crawl_rules">
+<h3 class="mt-4">Crawl Rules ({{no_crawl_rules}})</h1>
+</a>
+
+<table id="Crawl Rules" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Crawl Root</th>
+            <th>Type</th>
+            <th>Filter String</th>
+            <th>Verbose Expression</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for element in urlcontainsstring %}
+            {% for rule in element %}
+            <tr>
+                <td>{{rule.id}}</td>
+                <td>{{rule.crawl_root}}</td>
+                <td>{{rule.rule_type}}</td>
+                <td>{{rule.filter_string}}</td>
+                <td>{{rule}}</td>
+                <td><a href="/ChatEME/{{model.id}}/{{rule.id}}/delete_CrawlRule_URLContainsString" button class="btn btn-primary" role="button">Delete</a></td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        {% for element in urlnotcontainsstring %}
+            {% for rule in element %}
+            <tr>
+                <td>{{rule.id}}</td>
+                <td>{{rule.crawl_root}}</td>
+                <td>{{rule.rule_type}}</td>
+                <td>{{rule.filter_string}}</td>
+                <td>{{rule}}</td>
+                <td><a href="/ChatEME/{{model.id}}/{{rule.id}}/delete_CrawlRule_URLNotContainsString" button class="btn btn-primary" role="button">Delete</a></td>
+
+            </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<a id="web_pages">
+<h3 class="mt-4">Active Web Pages ({{no_active_webpages}})</h1>
+</a>
+
+<a href="/ChatEME/{{model.id}}/crawl_pages" button class="btn btn-primary" role="button">Crawl!</a>
+<a href="/ChatEME/{{model.id}}/apply_rules" button class="btn btn-primary" role="button">Apply rules</a>
+<a href="/ChatEME/{{model.id}}/clear_pages" button class="btn btn-primary" role="button">Clear pages</a>
+
+
+<table id="Active Pages" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Crawl Root</th>
+            <th>Parent WebPage</th>
+            <th>Crawl Depth</th>
+            <th>HTML bytes</th>
+            <th>Text Bytes</th>
+            <th>URL</th>
+            <th>Text/Source</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for page in web_pages %}
+        {% if page.active %}
+        <tr>
+            <td>{{page.get_short_title}}</td>
+            <td>{{page.crawl_root}}</td>
+            <td>{{page.parent.get_short_title}}</td>
+            <td>{{page.crawl_depth}}</td>
+            <td>{{page.get_len_html}}</td>
+            <td>{{page.get_len_text}}</td>
+            <td><a href="{{page.page_url}}">Link</a></td>
+            <td><a href="/ChatEME/{{model.id}}/{{page.id}}/page_source">Show</a></td>
+            <td>
+                <a href="/ChatEME/{{model.id}}/{{page.id}}/flip_active" button class="btn btn-info" role="button">Deactivate</a>
+                <a href="/ChatEME/{{model.id}}/update_WebPage/{{page.id}}" button class="btn btn-primary" role="button">Edit</a>
+            </td>
+
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3 class="mt-4">Inactive Web Pages</h1>
+
+<table id="Inactive Pages" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Crawl Root</th>
+            <th>Parent WebPage</th>
+            <th>Crawl Depth</th>
+            <th>HTML bytes</th>
+            <th>URL</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for page in web_pages %}
+        {% if not page.active %}
+        <tr>
+            <td>{{page.get_short_title}}</td>
+            <td>{{page.crawl_root}}</td>
+            <td>{{page.parent.get_short_title}}</td>
+            <td>{{page.crawl_depth}}</td>
+            <td>{{page.get_len_html}}</td>
+            <td><a href="{{page.page_url}}">Link</a></td>
+            <td><a href="/ChatEME/{{model.id}}/{{page.id}}/flip_active" button class="btn btn-outline-info" role="button">Activate</a></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<a id="pages_tree_plot">
+    
+    <h3 class="mt-4">Pages Tree Plot</h1>
+
+
+    {% autoescape off %}
+    {{ plt_div }}
+    {% endautoescape %}
+
+</a>
+{% endblock %}

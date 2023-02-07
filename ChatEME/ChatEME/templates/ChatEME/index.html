@@ -1,0 +1,36 @@
+{% extends 'ChatEME/base.html' %}
+
+{% block content %}
+
+<h1 class="mt-4">Models ({{no_models}})</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Dashboard</li>
+</ol>
+
+<a href="/ChatEME/add_ClassifierModel/" button class="btn btn-primary" role="button">New model</a>
+<a href="/ChatEME/load_model/" button class="btn btn-primary" role="button">Import model</a>
+
+<table id="Available Models" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for model in models %}
+        <tr>
+            <td><a href="/ChatEME/{{ model.id }}/">{{ model }}</a></td>
+            <td>{{ model.date }}</td>
+            <td>
+                <a href="/ChatEME/{{ model.id }}/delete_ClassifierModel" button class="btn btn-primary" role="button">Delete model</a>
+                <a href="/ChatEME/{{ model.id }}/update_ClassifierModel" button class="btn btn-primary" role="button">Edit model</a>
+                <a href="/ChatEME/{{ model.id }}/save_model" button class="btn btn-primary" role="button">Export Model</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %} 

@@ -1,0 +1,59 @@
+{% extends 'ChatEME/base.html' %}
+
+{% block content %}
+
+<h1 class="mt-4"><a href="/ChatEME/{{ model.id }}/">{{ model }}</a></h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">{{ cr }}</li>
+</ol>
+
+<h3 class="mt-4">URL Contain Rules</h1>
+<a href="/ChatEME/{{model.id}}/{{cr.id}}/add_CrawlRule_URLContainsString" button class="btn btn-primary" role="button">Add URL contains Rule</a>
+
+    <table id="Rules" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Crawl Root</th>
+                <th>Type</th>
+                <th>Filter String</th>
+                <th>str()</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rule in urlcontainsstring %}
+            <tr>
+                <td>{{rule.crawl_root}}</td>
+                <td>{{rule.rule_type}}</td>
+                <td>{{rule.filter_string}}</td>
+                <td>{{rule}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<h3 class="mt-4">URL NOT Contain Rules</h1>
+<a href="/ChatEME/{{model.id}}/{{cr.id}}/add_CrawlRule_URLNotContainsString" button class="btn btn-primary" role="button">Add URL NOT contains Rule</a>
+
+        <table id="NOT Rules" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Crawl Root</th>
+                    <th>Type</th>
+                    <th>Filter String</th>
+                    <th>str()</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rule in urlnotcontainsstring %}
+                <tr>
+                    <td>{{rule.crawl_root}}</td>
+                    <td>{{rule.rule_type}}</td>
+                    <td>{{rule.filter_string}}</td>
+                    <td>{{rule}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+{% endblock %}
