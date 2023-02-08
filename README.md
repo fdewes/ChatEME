@@ -20,6 +20,7 @@ git clone https://www.github.com/fdewes/ChatEME
 cd ChatEME/ChatEME
 pip install -r ../requirements.txt
 make init
-echo SECRET_KEY=\"`tr -dc A-Za-z0-9 </dev/urandom | head -c 50 ; echo ''`\" >> ChatEME_app/settings.py
+echo SECRET_KEY=\"`tr -dc A-Za-z0-9 </dev/urandom | head -c 50 ; \
+  echo ''`\" >> ChatEME_app/settings.py
 ./manage.py runserver 0:8000
 ```
