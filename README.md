@@ -7,7 +7,7 @@ that can automatically create training data for the classifier.
 
 By using the scraper module, it is possible to generate a language model that is
 able to semantically search your website with little effort. 
-The default language model ((rasa/LaBSE)[https://huggingface.co/rasa/LaBSE]) 
+The default language model ([rasa/LaBSE](https://huggingface.co/rasa/LaBSE))
 allows you to use any language as input once the model is trained. 
 
 The model server provides a convenient way to access the model via an API.
