@@ -126,3 +126,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+SECRET_KEY="MG1cUFexCNFQpKzd059VwC6lmw2pC2FVJtYQ71dIzcvYBKHxF2"

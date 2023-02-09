@@ -15,10 +15,12 @@
     # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import threading
+import ast
 from datasets import Dataset
 from json import dumps, loads, dump, load
 from os import makedirs
 from flask import Flask, request
+from requests import post
 
 import torch
 from transformers import AutoTokenizer, DataCollatorWithPadding
@@ -418,7 +420,7 @@ def bg_train_model(model_id):
 
         counter += 1
         label_verbose.append(("QAPair", int(qa.id)))
-        label_flask.append(["QAPair", str(qa.intent), str(qa.answer)])
+        label_flask.append(["QAPair", str(qa.id), str(qa.intent), str(qa.answer)])
 
     for page in pages:
         if page.get_len_text() > 0:
@@ -448,7 +450,9 @@ def bg_train_model(model_id):
 
             counter += 1
             label_verbose.append(("WebPage", int(page.id)))
-            label_flask.append(["WebPage", str(page.get_title()), 
+            label_flask.append(["WebPage", 
+                                str(page.id),
+                                str(page.get_title()), 
                                 str(page.page_url)])
 
     label2verbose = {l: v for l, v in enumerate(label_verbose)}
@@ -507,37 +511,32 @@ def bg_train_model(model_id):
 
 def inspect_model(request, model_id):
 
+    url = 'http://localhost:5000/ChatEME/'
     context = None
 
     if request.method == 'POST':
         form = UserInputForm(request.POST)
         if form.is_valid():
             model = get_object_or_404(ClassifierModel, pk=model_id)
-            tokenizer = AutoTokenizer.from_pretrained("models/" +  model.name)
-            lang_model = AutoModelForSequenceClassification.from_pretrained("models/" +  model.name)
-            label2verbose = {int(k): v for k, v in loads(model.label2verbose).items()}
-
+            
             text = form.cleaned_data.get('user_input')
 
-            encoding = tokenizer(text, return_tensors="pt")
+            myobj = {'text': text}
+            hdr = {'Content-Type': 'application/json; charset=utf-8',}
 
-            outputs = lang_model(**encoding)[0].detach().numpy()
+            x = post(url, json = myobj)
+            x = loads(x.text)
 
             pages = []
             qapairs = []
 
-            i=0
-
-            for v in outputs[0]:
-                t, pk = label2verbose[i]
-                if t == "WebPage":
-                    pages.append((v, WebPage.objects.get(pk=pk)))
-                else:
-                    qapairs.append((v, QAPair.objects.get(pk=pk)))
-                i+=1
-
-            pages = sorted(pages, key=lambda tup: tup[0], reverse=True)
-            qapairs = sorted(qapairs, key=lambda tup: tup[0], reverse=True)
+            for k in x.keys():
+                for e in ast.literal_eval(x[k]):
+                    t, pk, _ , _ , c = e
+                    if t == "WebPage":
+                        pages.append((c, WebPage.objects.get(pk=int(pk))))
+                    else:
+                        qapairs.append((c, QAPair.objects.get(pk=int(pk))))
 
             context = {
                 'pages': pages,
@@ -890,6 +889,7 @@ def bg_serve_model(model_id):
                                 label2flask[str(i)][0],
                                 label2flask[str(i)][1],
                                 label2flask[str(i)][2],
+                                label2flask[str(i)][3],
                                 confidence
                                 ))
                 i+=1

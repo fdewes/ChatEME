@@ -127,4 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#ChatEME
 ChatEME/ChatEME_app/settings.py
+models/
