@@ -16,9 +16,11 @@
 
 import threading
 from datasets import Dataset
-from json import dumps, loads, dump
+from json import dumps, loads, dump, load
 from os import makedirs
+from flask import Flask, request
 
+import torch
 from transformers import AutoTokenizer, DataCollatorWithPadding
 from transformers import TrainingArguments, Trainer
 from transformers import AutoModelForSequenceClassification
@@ -840,3 +842,74 @@ def save_model(request, model_id):
         )
 
     return response
+
+
+def serve_model(request, model_id):
+    """
+    Serves the model via flask in own thread
+    """
+
+    thread = threading.Thread(target=bg_serve_model,args=[model_id], 
+        daemon=True)
+    thread.start()
+
+    return redirect ("ChatEME:ClassifierModelDetail", model_id = model_id)
+
+
+def bg_serve_model(model_id):
+
+    classifier_model = get_object_or_404(ClassifierModel, pk=model_id)
+
+    MAX_QAPAIRS = 5
+    MAX_WEBPAGES = 5
+
+    device = "cpu"
+    tokenizer = AutoTokenizer.from_pretrained("models/" + classifier_model.name)
+    model = AutoModelForSequenceClassification.from_pretrained("models/" + classifier_model.name)
+
+    with open("models/" + classifier_model.name + "/label2flask.json") as json_file:
+        label2flask = load(json_file)
+
+    app = Flask(__name__)
+
+    app.config['JSON_AS_ASCII'] = False
+
+    @app.route("/ChatEME/", methods=['POST', 'GET'])
+    def serve_model():
+        if request.method == 'POST':
+
+            response = request.get_json()
+            encoding = tokenizer(response['text'], return_tensors="pt")
+            outputs = model(**encoding)[0].detach().numpy()
+
+            results = []
+            i=0
+
+            for confidence in outputs[0]:
+                results.append((
+                                label2flask[str(i)][0],
+                                label2flask[str(i)][1],
+                                label2flask[str(i)][2],
+                                confidence
+                                ))
+                i+=1
+
+            qapairs = []
+            webpages = []
+
+            for result in results:
+                if result[0] == "QAPair":
+                    qapairs.append(result)
+                else:
+                    webpages.append(result)
+
+
+            qapairs = sorted(qapairs, key=lambda tup: tup[-1], reverse=True)
+            webpages = sorted(webpages, key=lambda tup: tup[-1], reverse=True)
+
+            return {"QAPairs": str(qapairs[0:MAX_QAPAIRS]),
+                    "WebPages": str(webpages[0:MAX_WEBPAGES])}
+        else:
+            return '<p>Usage: POST {"text": "text to classify"}</p>'
+
+    app.run()
