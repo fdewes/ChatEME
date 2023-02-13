@@ -16,6 +16,7 @@
             <th>Confidence</th>
             <th>Intent</th>
             <th>Answer</th>
+            <th>Penalize</th>
         </tr>
     </thead>
     <tbody>
@@ -24,6 +25,7 @@
             <td>{{c}}</td>
             <td>{{qa.intent}}</td>
             <td>{{qa.answer}}</td>
+            <td><a href="{% url 'ChatEME:penalize_qapair' model_id=context.model_id pair_id=qa.id user_input=context.user_input %}">Penalize</a></td>
         </tr>
         {% endfor %}
     </tbody>
@@ -40,6 +42,7 @@
             <th>Title</th>
             <th>Text/Source</th>
             <th>URL</th>
+            <th>Penalize</th>
         </tr>
     </thead>
     <tbody>
@@ -49,6 +52,8 @@
             <td>{{page.get_short_title}}</td>
             <td><a href="/ChatEME/{{context.model_id}}/{{page.id}}/page_source">Show</a></td>
             <td><a href="{{page.page_url}}">Link</a></td>
+            <td><a href="{% url 'ChatEME:penalize_webpage' model_id=context.model_id page_id=page.id user_input=context.user_input %}">Penalize</a></td>
+
         </tr>
         {% endfor %}
     </tbody>

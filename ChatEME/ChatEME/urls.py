@@ -56,4 +56,7 @@ urlpatterns = [
     path('<int:model_id>/import_RasaNLUFile/', views.import_RasaNLUFile, name='import_RasaNLUFile'),
     path('<int:model_id>/import_RasaDomainFile/', views.import_RasaDomainFile, name='import_RasaDomainFile'),
     path('<int:model_id>/export_oos2json/', views.export_oos2json, name='export_oos2json'),
+    path('<int:model_id>/<int:page_id>/penalize_WebPage/<str:user_input>', views.penalize_WebPage, name='penalize_webpage'),
+    path('<int:model_id>/<int:pair_id>/penalize_QAPair/<str:user_input>', views.penalize_QAPair, name='penalize_qapair'),
+
 ]

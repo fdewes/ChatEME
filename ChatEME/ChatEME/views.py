@@ -28,6 +28,7 @@ from transformers import TrainingArguments, Trainer
 from transformers import AutoModelForSequenceClassification
 
 from django.http import HttpResponse
+from django.utils.http import urlencode
 from django.template import loader
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.edit import UpdateView, DeleteView
@@ -50,7 +51,7 @@ from .files import handle_uploaded_nlu_file, handle_uploaded_save_file
 from .files import handle_uploaded_domain_file, create_save_file
 
 from datetime import datetime
-
+from urllib.parse import parse_qs
 
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15" # This has to move somewhere else
 
@@ -541,7 +542,8 @@ def inspect_model(request, model_id):
             context = {
                 'pages': pages,
                 'qapairs': qapairs,
-                'model_id': model_id
+                'model_id': model_id,
+                'user_input': urlencode({"text": text})
             }
 
     else:
@@ -913,3 +915,24 @@ def bg_serve_model(model_id):
             return '<p>Usage: POST {"text": "text to classify"}</p>'
 
     app.run()
+
+def penalize_WebPage(request, model_id, page_id, user_input):
+    page = get_object_or_404(WebPage, classifier_model=model_id, pk=page_id)
+
+    penalty_text = parse_qs(user_input)['text'][0]
+    page.penalty_text += penalty_text + "\n"
+    page.save() 
+
+    return redirect ("ChatEME:inspect_model", model_id = model_id)
+
+
+def penalize_QAPair(request, model_id, pair_id, user_input):
+    pair = get_object_or_404(QAPair, classifier_model=model_id, pk=pair_id)
+
+    penalty_text = parse_qs(user_input)['text'][0]
+    pair.penalty_text += penalty_text + "\n"
+    pair.save() 
+
+    return redirect ("ChatEME:inspect_model", model_id = model_id)
+
+    
