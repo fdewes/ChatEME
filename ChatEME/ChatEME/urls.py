@@ -33,6 +33,7 @@ urlpatterns = [
     path('<int:model_id>/extract_text_from_html/', extract_text_from_html, name='extract_text_from_html'),
     path('<int:model_id>/train_model/', views.train_model, name='train_model'),
     path('<int:model_id>/inspect_model/', views.inspect_model, name='inspect_model'),
+    path('<int:model_id>/serve_model/', views.serve_model, name='serve_model'),
     path('<int:model_id>/<int:cr_id>/', views.CrawlRootDetail, name='CrawlRootDetail'),
     path('<int:model_id>/<int:cr_id>/delete', views.delete_CrawlRoot, name='delete_CrawlRootDetail'),
     path('<int:model_id>/<int:cr_id>/add_CrawlRule_URLContainsString', views.add_CrawlRule_URLContainsString, name='add_CrawlRule_URLContainsString'),
@@ -55,4 +56,7 @@ urlpatterns = [
     path('<int:model_id>/import_RasaNLUFile/', views.import_RasaNLUFile, name='import_RasaNLUFile'),
     path('<int:model_id>/import_RasaDomainFile/', views.import_RasaDomainFile, name='import_RasaDomainFile'),
     path('<int:model_id>/export_oos2json/', views.export_oos2json, name='export_oos2json'),
+    path('<int:model_id>/<int:page_id>/penalize_WebPage/<str:user_input>', views.penalize_WebPage, name='penalize_webpage'),
+    path('<int:model_id>/<int:pair_id>/penalize_QAPair/<str:user_input>', views.penalize_QAPair, name='penalize_qapair'),
+
 ]
