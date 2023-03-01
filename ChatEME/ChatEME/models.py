@@ -125,7 +125,8 @@ class WebPage(models.Model):
         on_delete=models.CASCADE)
     )
 
-    page_url = models.CharField(max_length=400)
+    page_url = models.CharField(max_length=4)
+    page_title = models.TextField(default="", blank=True)
     active = models.BooleanField(default=True)
     links_processed = models.BooleanField(default=False)
     crawl_depth = models.IntegerField(default=0)
@@ -152,18 +153,20 @@ class WebPage(models.Model):
         return self.unique_text.replace("\n", "<br>")
 
     def get_title(self):
-        s = search("<title>(.+?)</title>", self.html)
-        if s is None:
-            return "#" 
-        else:
-            return s.group(1)
+        return self.page_title
+        #s = search("<title>(.+?)</title>", self.html)
+        #if s is None:
+        #    return "#" 
+        #else:
+        #    return s.group(1)
 
     def get_short_title(self):
-        s = search("<title>(.+?)</title>", self.html)
-        if s is None:
-            return "#" 
-        else:
-            return s.group(1)[0:30]
+        return self.page_title[0:30]
+        #s = search("<title>(.+?)</title>", self.html)
+        #if s is None:
+        #    return "#" 
+        #else:
+        #    return s.group(1)[0:30]
 
     def __str__(self):
         return self.page_url
@@ -245,6 +248,13 @@ def bg_crawl(model_id, crawl_roots):
 
                 html, links = webpage.crawl()
                 webpage.html = str(html)
+                webpage.save()
+
+                s = search("<title>(.+?)</title>", webpage.html)
+                if s is None:
+                   webpage.page_title = "#" 
+                else:
+                   webpage.page_title = s.group(1)
                 webpage.save()
 
                 if webpage.crawl_depth > 0:

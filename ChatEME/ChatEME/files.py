@@ -124,6 +124,7 @@ def handle_uploaded_save_file(file):
                 classifier_model = cm,
                 crawl_root = cr,
                 page_url = page_url,
+                page_title = webpages[page_url]['page_title'],
                 active = webpages[page_url]['active'],
                 links_processed = webpages[page_url]['links_processed'],
                 crawl_depth = webpages[page_url]['crawl_depth'],
@@ -184,6 +185,7 @@ def create_save_file(model_id):
         for webpage in webpages:
             Export_WebPages[webpage.page_url] = {
                 "active": webpage.active,
+                "page_title": webpage.page_title,
                 "links_processed": webpage.links_processed,
                 "crawl_depth": int(webpage.crawl_depth),
                 "unique_text": webpage.unique_text,

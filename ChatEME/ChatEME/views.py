@@ -605,7 +605,7 @@ class WebPageUpdateView(UpdateView):
     """
 
     model = WebPage
-    fields = ('additional_text', 'unique_text', 'penalty_text')
+    fields = ('page_title','additional_text', 'unique_text', 'penalty_text')
 
     template_name = 'ChatEME/generic_model_form.html'
 
